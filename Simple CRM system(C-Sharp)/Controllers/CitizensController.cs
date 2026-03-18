@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Simple_CRM_system_C_Sharp_.Data;
 using Simple_CRM_system_C_Sharp_.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Simple_CRM_system_C_Sharp_.Controllers
 {
+    [Authorize]
     public class CitizensController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -60,7 +62,15 @@ namespace Simple_CRM_system_C_Sharp_.Controllers
             {
                 _context.Add(citizen);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                ViewBag.Title = "Реєстрація успішна";
+                ViewBag.Header = "Справу відкрито!";
+                ViewBag.Message = $"Громадянин {citizen.FullName} успішно доданий до картотеки. Рівень відчаю зафіксовано на позначці {citizen.DespairLevel}.";
+
+                ViewBag.NextController = "Complaints"; 
+                ViewBag.NextAction = "Create";         
+                ViewBag.NextLabel = "Оформити скаргу";
+                return View("Success");
             }
             return View(citizen);
         }

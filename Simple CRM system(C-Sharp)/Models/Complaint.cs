@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http;
 
 
 
@@ -25,5 +26,16 @@ namespace Simple_CRM_system_C_Sharp_.Models
         public int DepartmentId { get; set; }
         [ForeignKey("DepartmentId")]
         public Department? Department { get; set; }
+
+
+        [Display(Name = "Прикріплений доказ")]
+        public string? EvidenceFilePath { get; set; }
+
+
+        [NotMapped]
+        [Display(Name = "Завантажити документ (PDF/JPG)")]
+        public IFormFile? EvidenceFile { get; set; }
+
+
     }
 }

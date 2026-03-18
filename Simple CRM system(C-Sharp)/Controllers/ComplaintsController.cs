@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Simple_CRM_system_C_Sharp_.Data;
 using Simple_CRM_system_C_Sharp_.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Simple_CRM_system_C_Sharp_.Controllers
 {
+    [Authorize]
     public class ComplaintsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -59,16 +61,44 @@ namespace Simple_CRM_system_C_Sharp_.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Content,CreatedAt,CitizenId,DepartmentId")] Complaint complaint)
+        public async Task<IActionResult> Create(Complaint complaint) 
         {
             if (ModelState.IsValid)
             {
+              
+                if (complaint.EvidenceFile != null && complaint.EvidenceFile.Length > 0)
+                {
+              
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(complaint.EvidenceFile.FileName);
+
+                  
+                    string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+
+                  
+                    if (!Directory.Exists(uploadPath))
+                        Directory.CreateDirectory(uploadPath);
+
+                    string fullPath = Path.Combine(uploadPath, fileName);
+
+                
+                    using (var fileStream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await complaint.EvidenceFile.CopyToAsync(fileStream);
+                    }
+
+                    
+                    complaint.EvidenceFilePath = "/uploads/" + fileName;
+                }
+
                 _context.Add(complaint);
                 await _context.SaveChangesAsync();
+
+                
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CitizenId"] = new SelectList(_context.Citizens, "Id", "FullName", complaint.CitizenId);
-            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", complaint.DepartmentId);
+
+            
+
             return View(complaint);
         }
 

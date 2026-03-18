@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Simple_CRM_system_C_Sharp_.Data;
 using Simple_CRM_system_C_Sharp_.Models;
 
 
 namespace Simple_CRM_system_C_Sharp_.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -18,6 +19,13 @@ namespace Simple_CRM_system_C_Sharp_.Data
         public DbSet<HeadOfdepartment> DepartmentHeads { get; set; }
         public DbSet<Complaint> Complaints { get; set; }
 
-        
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            
+            base.OnModelCreating(modelBuilder);
+
+            
+        }
+
     }
 }
